@@ -1,6 +1,6 @@
 {
   "appId": "com.mathquest.web",
   "appName": "MathQuest",
-  "webDir": ".",
+  "webDir": "dist",
   "bundledWebRuntime": false
 }

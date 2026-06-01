@@ -1,131 +1,39 @@
-const DEFAULT_LEVELS = {
-  basico: {
-    nombre: "Nivel Básico",
-    color: [0.18, 0.8, 0.44, 1],
-    dark: [0.07, 0.38, 0.2, 1],
-    tiempo: 60,
-    preguntas: [
-      { p: "¿Cuánto es 8 + 5?", o: ["12", "13", "14", "15"], r: "13", exp: "8 + 5 se cuenta como 8, 9, 10, 11, 12, 13." },
-      { p: "¿Cuánto es 7 × 6?", o: ["36", "40", "42", "48"], r: "42", exp: "7 grupos de 6 forman 42." },
-      { p: "Vendes 3 gelatinas a $15. ¿Total?", o: ["30", "35", "40", "45"], r: "45", exp: "3 × 15 = 45." },
-      { p: "¿Cuánto es 9 × 8?", o: ["63", "72", "81", "64"], r: "72", exp: "9 × 8 = 72." },
-      { p: "Cobras $35 y pagan con $100. Cambio:", o: ["55", "65", "75", "85"], r: "65", exp: "100 - 35 = 65." },
-      { p: "¿Cuánto es 5 × 12?", o: ["55", "60", "65", "70"], r: "60", exp: "5 × 12 = 60." }
-    ]
-  },
-  intermedio: {
-    nombre: "Nivel Intermedio",
-    color: [1, 0.58, 0.08, 1],
-    dark: [0.55, 0.27, 0.02, 1],
-    tiempo: 90,
-    preguntas: [
-      { p: "1/2 + 1/4 = ?", o: ["2/6", "3/4", "1/4", "1/2"], r: "3/4", exp: "1/2 equivale a 2/4; 2/4 + 1/4 = 3/4." },
-      { p: "3/5 en decimal:", o: ["0.3", "0.5", "0.6", "0.8"], r: "0.6", exp: "3 dividido entre 5 es 0.6." },
-      { p: "25% de 80 = ?", o: ["15", "20", "25", "30"], r: "20", exp: "25% es la cuarta parte; 80 / 4 = 20." },
-      { p: "2/3 + 1/6 = ?", o: ["3/9", "5/6", "1/2", "3/6"], r: "5/6", exp: "2/3 equivale a 4/6; 4/6 + 1/6 = 5/6." },
-      { p: "7/10 como porcentaje:", o: ["17%", "57%", "70%", "77%"], r: "70%", exp: "7/10 equivale a 70/100, es decir 70%." },
-      { p: "Simplifica: 8/12", o: ["1/2", "2/3", "3/4", "4/6"], r: "2/3", exp: "Divide 8 y 12 entre 4: 8/12 = 2/3." }
-    ]
-  },
-  preavanzado: {
-    nombre: "Nivel Avanzado",
-    color: [0.9, 0.22, 0.32, 1],
-    dark: [0.42, 0.07, 0.13, 1],
-    tiempo: 120,
-    preguntas: [
-      { p: "¿Cuánto es 3^2?", o: ["6", "9", "12", "18"], r: "9", exp: "3^2 significa 3 × 3, que vale 9." },
-      { p: "¿Cuál es la raíz de 49?", o: ["6", "7", "8", "9"], r: "7", exp: "7 × 7 = 49, por eso la raíz cuadrada es 7." },
-      { p: "x + 4 = 10  ->  x = ?", o: ["4", "5", "6", "10"], r: "6", exp: "Resta 4 a ambos lados: x = 10 - 4 = 6." },
-      { p: "2x = 14  ->  x = ?", o: ["5", "6", "7", "8"], r: "7", exp: "Divide entre 2: x = 14 / 2 = 7." },
-      { p: "3x - 5 = 10  ->  x = ?", o: ["3", "4", "5", "6"], r: "5", exp: "Suma 5 y divide entre 3: 15 / 3 = 5." },
-      { p: "Área cuadrado lado 6", o: ["12", "24", "36", "48"], r: "36", exp: "El área del cuadrado es lado × lado: 6 × 6 = 36." }
-    ]
-  }
-};
+import {
+  DEFAULT_LEVELS,
+  PHYSICAL_CHALLENGES,
+  STORY_ZONES,
+  BOSSES,
+  AVATARS,
+  ACHIEVEMENTS,
+  POWER_SHOP,
+  THEME_SHOP,
+  MISSIONS,
+  OPTION_COLORS,
+  createProfile,
+  loadData,
+  saveData,
+  activeProfile,
+  todayKey,
+  yesterdayKey
+} from "./src/data.js";
 
-const PHYSICAL_CHALLENGES = [
-  "PAUSA: Estírate hacia arriba por 5 seg.",
-  "PAUSA: Gira tu cuello suavemente 3 veces.",
-  "PAUSA: Cierra los ojos y respira hondo 3 veces.",
-  "PAUSA: Levántate y da 5 saltos pequeños."
-];
-
-const STORY_ZONES = {
-  basico: { name: "Bosque de Sumas", crystal: "Cristal Verde", unlocks: "intermedio" },
-  intermedio: { name: "Mercado de Fracciones", crystal: "Cristal Dorado", unlocks: "preavanzado" },
-  preavanzado: { name: "Torre del Álgebra", crystal: "Cristal Rojo", unlocks: null }
-};
-
-const BOSSES = {
-  basico: {
-    name: "Guardián del Bosque",
-    needed: 3,
-    maxHp: 3,
-    taunts: ["Mis raíces son profundas.", "El bosque cuenta contigo.", "Una suma más y cederé."],
-    hit: "Las hojas brillan con tu respuesta.",
-    miss: "El guardián lanza semillas espinosas."
-  },
-  intermedio: {
-    name: "Mercader de Fracciones",
-    needed: 3,
-    maxHp: 3,
-    taunts: ["Nada se vende sin equivalencias.", "Divide bien tus ideas.", "El mercado escucha."],
-    hit: "La balanza de fracciones se inclina a tu favor.",
-    miss: "El mercader mezcla los denominadores."
-  },
-  preavanzado: {
-    name: "Señor de la Torre",
-    needed: 4,
-    maxHp: 4,
-    taunts: ["La incógnita protege mi torre.", "Despeja con cuidado.", "El álgebra exige precisión."],
-    hit: "Una grieta aparece en la torre.",
-    miss: "La torre responde con un rayo algebraico."
-  }
-};
-
-const AVATARS = {
-  maga: { name: "Mago Numérica", img: "assets/avatar-maga.png", icon: "✦", color: "#7c6cff" },
-  explorador: { name: "Explorador", img: "assets/avatar-explorador.png", icon: "◆", color: "#2ecc71" },
-  robot: { name: "Robot Lógico", img: "assets/avatar-robot.png", icon: "▣", color: "#38bdf8" },
-  caballera: { name: "Guardian", img: "assets/avatar-guardiana.png", icon: "▲", color: "#f59e0b" }
-};
-
-const ACHIEVEMENTS = {
-  streak5: { title: "Racha brillante", desc: "Responde 5 preguntas correctas seguidas." },
-  noLivesLost: { title: "Intocable", desc: "Termina una práctica sin perder vidas." },
-  fastExam: { title: "Velocidad mental", desc: "Termina un examen usando menos de la mitad del tiempo." },
-  daily3: { title: "Constancia", desc: "Completa retos diarios durante 3 días seguidos." },
-  forestBoss: { title: "Héroe del bosque", desc: "Vence al jefe del Bosque de Sumas." },
-  rich100: { title: "Bolsa de cristales", desc: "Consigue 100 monedas acumuladas." }
-};
-
-const POWER_SHOP = {
-  congelar: { name: "Congelar tiempo", cost: 50, desc: "Detiene el reloj durante 5 segundos." },
-  eliminar: { name: "Eliminar opción", cost: 40, desc: "Quita una respuesta incorrecta." },
-  doble: { name: "Doble puntos", cost: 60, desc: "La siguiente respuesta correcta vale doble." },
-  pista: { name: "Pista", cost: 35, desc: "Muestra una ayuda corta para la pregunta actual." },
-  extraTiempo: { name: "Tiempo extra", cost: 70, desc: "Agrega 15 segundos en examen." }
-};
-
-const THEME_SHOP = {
-  bosque: { name: "Tema bosque", cost: 90, desc: "Verdes, madera y energía de aventura.", className: "theme-bosque" },
-  galaxia: { name: "Tema galaxia", cost: 110, desc: "Azules profundos con brillo espacial.", className: "theme-galaxia" },
-  lava: { name: "Tema lava", cost: 100, desc: "Contrastes calientes para jefes intensos.", className: "theme-lava" },
-  hielo: { name: "Tema hielo", cost: 100, desc: "Tonos claros y fríos para practicar con calma.", className: "theme-hielo" }
-};
-
-const MISSIONS = {
-  tenSums: { title: "Responde 10 sumas correctamente", target: 10, metric: "sumasCorrectas" },
-  noPowerWin: { title: "Gana una partida sin usar poderes", target: 1, metric: "victoriasSinPoderes" },
-  forestBoss: { title: "Vence al jefe del bosque", target: 1, metric: "jefeBosque" },
-  coins100: { title: "Consigue 100 monedas", target: 100, metric: "monedasGanadas" }
-};
-
-const OPTION_COLORS = ["#f24355", "#258ee8", "#edae1e", "#8b55dd"];
-const DATA_KEY = "mathquest_web_data";
-const app = document.querySelector("#app");
-const okSound = document.querySelector("#sound-ok");
-const errorSound = document.querySelector("#sound-error");
+import {
+  esc,
+  avatarImage,
+  rgba,
+  randomInt,
+  shuffle,
+  sample,
+  play,
+  normalizeLevels,
+  makeQuestion,
+  numberOptions,
+  generateQuestion,
+  enrichQuestions,
+  getBestScore,
+  unlockAchievement,
+  unlockStory
+} from "./src/game.js";
 
 let levels = normalizeLevels(DEFAULT_LEVELS);
 let timerId = null;
@@ -134,97 +42,11 @@ let quiz = null;
 const state = {
   data: loadData()
 };
+const app = document.querySelector("#app");
+const okSound = document.querySelector("#sound-ok");
+const errorSound = document.querySelector("#sound-error");
 
-function createProfile(id, name, seed = {}) {
-  const story = seed.story || {};
-  const stats = seed.stats || {};
-  const inventario = seed.inventario || {};
-  return {
-    id,
-    name,
-    avatar: seed.avatar && AVATARS[seed.avatar] ? seed.avatar : "maga",
-    scores: seed.scores || {},
-    monedas: seed.monedas || 0,
-    inventario: {
-      congelar: inventario.congelar || 0,
-      eliminar: inventario.eliminar || 0,
-      doble: inventario.doble || 0,
-      pista: inventario.pista || 0,
-      extraTiempo: inventario.extraTiempo || 0,
-      tema: inventario.tema || "oscuro",
-      temas: Array.isArray(inventario.temas) ? inventario.temas : ["oscuro"]
-    },
-    achievements: seed.achievements || {},
-    stats: {
-      correctas: stats.correctas || 0,
-      preguntas: stats.preguntas || 0,
-      sumasCorrectas: stats.sumasCorrectas || 0,
-      mejorRacha: stats.mejorRacha || 0,
-      monedasGanadas: stats.monedasGanadas || 0,
-      victoriasSinPoderes: stats.victoriasSinPoderes || 0,
-      jefeBosque: stats.jefeBosque || 0
-    },
-    daily: {
-      lastDate: seed.daily?.lastDate || "",
-      streak: seed.daily?.streak || 0,
-      completed: seed.daily?.completed || {}
-    },
-    story: {
-      unlocked: Array.isArray(story.unlocked) && story.unlocked.length ? story.unlocked : ["basico"],
-      crystals: story.crystals || {}
-    }
-  };
-}
-
-function normalizeData(raw) {
-  const migrated = raw && typeof raw === "object" ? raw : {};
-  if (!migrated.profiles) {
-    const profile = createProfile("p1", "Alumno 1", {
-      scores: migrated.scores || {},
-      monedas: migrated.monedas || 0,
-      inventario: migrated.inventario || {}
-    });
-    return { activeProfileId: "p1", profiles: [profile], ranking: migrated.ranking || [] };
-  }
-
-  const profiles = migrated.profiles.map((profile, index) => (
-    createProfile(profile.id || `p${index + 1}`, profile.name || `Alumno ${index + 1}`, profile)
-  ));
-  return {
-    activeProfileId: migrated.activeProfileId || profiles[0]?.id || "p1",
-    profiles: profiles.length ? profiles : [createProfile("p1", "Alumno 1")],
-    ranking: Array.isArray(migrated.ranking) ? migrated.ranking : []
-  };
-}
-
-function loadData() {
-  try {
-    return normalizeData(JSON.parse(localStorage.getItem(DATA_KEY) || "{}"));
-  } catch {
-    return normalizeData({});
-  }
-}
-
-function saveData() {
-  localStorage.setItem(DATA_KEY, JSON.stringify(state.data));
-}
-
-function activeProfile() {
-  return state.data.profiles.find((profile) => profile.id === state.data.activeProfileId)
-    || state.data.profiles[0];
-}
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function yesterdayKey() {
-  const date = new Date();
-  date.setDate(date.getDate() - 1);
-  return date.toISOString().slice(0, 10);
-}
-
-function applyTheme(profile = activeProfile()) {
+function applyTheme(profile = activeProfile(state)) {
   const theme = profile?.inventario?.tema || "oscuro";
   document.body.className = "";
   if (THEME_SHOP[theme]) document.body.classList.add(THEME_SHOP[theme].className);
@@ -238,51 +60,6 @@ function missionPercent(profile, mission) {
   return Math.round((missionProgress(profile, mission) / mission.target) * 100);
 }
 
-function esc(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  }[char]));
-}
-
-function avatarImage(avatar, className = "avatar-img") {
-  const data = avatar || AVATARS.maga;
-  return `
-    <img class="${className}" src="${esc(data.img)}" alt="${esc(data.name)}" onerror="this.remove();">
-    <span class="avatar-fallback">${esc(data.icon)}</span>
-  `;
-}
-
-function rgba(parts, alpha = parts[3] ?? 1) {
-  const [r, g, b] = parts;
-  return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${alpha})`;
-}
-
-function randomInt(min, max) {
-  return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-function shuffle(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function sample(items, count) {
-  return shuffle(items).slice(0, count);
-}
-
-function play(sound) {
-  sound.currentTime = 0;
-  sound.play().catch(() => {});
-}
-
 function clearTimer() {
   if (timerId) {
     clearInterval(timerId);
@@ -294,12 +71,6 @@ function goMenu() {
   quiz = null;
   clearTimer();
   renderMenu();
-}
-
-function getBestScore(...scores) {
-  return scores
-    .filter(Boolean)
-    .reduce((best, current) => (!best || current.pts > best.pts ? current : best), null);
 }
 
 function getLevelProgress(profile, levelKey) {
@@ -343,187 +114,6 @@ function getProfileProgress(profile) {
   };
 }
 
-function normalizeLevels(source) {
-  return Object.fromEntries(Object.entries(source).map(([key, level]) => {
-    const defaults = DEFAULT_LEVELS[key]?.preguntas || [];
-    const preguntas = (level.preguntas || []).map((question, index) => ({
-      ...question,
-      exp: question.exp || defaults[index]?.exp || "Revisa la operación paso a paso."
-    }));
-    return [key, { ...level, preguntas }];
-  }));
-}
-
-function makeQuestion(p, options, answer, exp, tipo = "math", extra = {}) {
-  return { p, o: shuffle([...new Set(options.map(String))]).slice(0, 4), r: String(answer), exp, tipo, ...extra };
-}
-
-function numberOptions(answer, spread = 12) {
-  const values = new Set([answer]);
-  while (values.size < 4) {
-    const wrong = answer + randomInt(-spread, spread);
-    if (wrong >= 0 && wrong !== answer) values.add(wrong);
-  }
-  return [...values].map(String);
-}
-
-function generateBasicQuestion() {
-  const kind = sample(["sum", "sub", "mul", "money", "input", "order", "visualCoins", "truefalse"], 1)[0];
-  if (kind === "sum") {
-    const a = randomInt(6, 35);
-    const b = randomInt(4, 28);
-    return makeQuestion(`¿Cuánto es ${a} + ${b}?`, numberOptions(a + b), a + b, `${a} + ${b} = ${a + b}.`, "math", { skill: "sum" });
-  }
-  if (kind === "sub") {
-    const a = randomInt(25, 90);
-    const b = randomInt(5, a - 5);
-    return makeQuestion(`¿Cuánto es ${a} - ${b}?`, numberOptions(a - b), a - b, `${a} - ${b} = ${a - b}.`);
-  }
-  if (kind === "input") {
-    const a = randomInt(10, 40);
-    const b = randomInt(5, 30);
-    return makeQuestion(`Escribe la respuesta: ${a} + ${b}`, [], a + b, `${a} + ${b} = ${a + b}.`, "input", { skill: "sum" });
-  }
-  if (kind === "order") {
-    const a = randomInt(12, 30);
-    const b = randomInt(6, 18);
-    const steps = [`Escribe ${a} + ${b}`, `Suma unidades`, `Obtén ${a + b}`];
-    return makeQuestion(`Ordena los pasos para resolver ${a} + ${b}`, [], steps.join("|"), `${a} + ${b} = ${a + b}.`, "order", { steps, skill: "sum" });
-  }
-  if (kind === "visualCoins") {
-    const coins = sample([2, 3, 4, 5, 6], 1)[0];
-    const value = sample([5, 10], 1)[0];
-    return makeQuestion(`Cada moneda vale $${value}. ¿Cuánto hay en total?`, numberOptions(coins * value, 15), coins * value, `${coins} monedas de ${value} valen ${coins * value}.`, "visual", { visual: { type: "coins", count: coins, label: `$${value}` } });
-  }
-  if (kind === "truefalse") {
-    const a = randomInt(3, 10);
-    const b = randomInt(3, 10);
-    const shown = Math.random() > 0.5 ? a * b : a * b + sample([-2, -1, 1, 2], 1)[0];
-    const answer = shown === a * b ? "Verdadero" : "Falso";
-    return makeQuestion(`${a} × ${b} = ${shown}`, ["Verdadero", "Falso"], answer, `${a} × ${b} = ${a * b}.`, "truefalse");
-  }
-  if (kind === "money") {
-    const units = randomInt(2, 7);
-    const price = sample([8, 10, 12, 15, 20], 1)[0];
-    return makeQuestion(`Compras ${units} productos de $${price}. ¿Total?`, numberOptions(units * price), units * price, `${units} × ${price} = ${units * price}.`);
-  }
-  const a = randomInt(3, 12);
-  const b = randomInt(3, 12);
-  return makeQuestion(`¿Cuánto es ${a} × ${b}?`, numberOptions(a * b), a * b, `${a} × ${b} = ${a * b}.`);
-}
-
-function generateIntermediateQuestion() {
-  const kind = sample(["percent", "decimal", "fraction", "fill", "visualFraction", "visualPercent", "truefalse"], 1)[0];
-  if (kind === "percent") {
-    const pct = sample([10, 20, 25, 50, 75], 1)[0];
-    const base = randomInt(4, 16) * 10;
-    const answer = base * pct / 100;
-    return makeQuestion(`${pct}% de ${base} = ?`, numberOptions(answer, 20), answer, `${pct}% de ${base} se calcula como ${base} × ${pct / 100} = ${answer}.`);
-  }
-  if (kind === "decimal") {
-    const n = randomInt(1, 9);
-    return makeQuestion(`${n}/10 como decimal:`, [`0.${n}`, `${n}.0`, `0.${Math.max(n - 1, 0)}`, `0.${Math.min(n + 1, 9)}`], `0.${n}`, `${n}/10 equivale a 0.${n}.`);
-  }
-  if (kind === "fill") {
-    const n = randomInt(2, 8);
-    return makeQuestion(`Completa: ${n}/10 = ____%`, [], n * 10, `${n}/10 equivale a ${n * 10}/100, es decir ${n * 10}%.`, "fill", { suffix: "%" });
-  }
-  if (kind === "visualFraction") {
-    const numerator = randomInt(1, 5);
-    return makeQuestion(`La barra muestra ${numerator}/6. ¿Qué fracción representa?`, [`${numerator}/6`, `${numerator}/5`, `${numerator + 1}/6`, `1/${numerator}`], `${numerator}/6`, `${numerator} de 6 partes están iluminadas.`, "visual", { visual: { type: "fraction", numerator, denominator: 6 } });
-  }
-  if (kind === "visualPercent") {
-    const pct = sample([20, 30, 40, 50, 75], 1)[0];
-    return makeQuestion(`Observa la barra de 100%. ¿Qué porcentaje está marcado?`, [`${pct}%`, `${pct + 10}%`, `${Math.max(10, pct - 10)}%`, `${pct / 10}%`], `${pct}%`, `La barra marca ${pct} de cada 100 partes.`, "visual", { visual: { type: "percent", percent: pct } });
-  }
-  if (kind === "truefalse") {
-    const answer = Math.random() > 0.5;
-    return makeQuestion(`1/2 equivale a ${answer ? "50%" : "25%"}`, ["Verdadero", "Falso"], answer ? "Verdadero" : "Falso", "1/2 es la mitad de 100%, por eso equivale a 50%.", "truefalse");
-  }
-  const numerator = randomInt(1, 4);
-  const answer = `${numerator + 1}/6`;
-  return makeQuestion(`${numerator}/6 + 1/6 = ?`, [answer, `${numerator}/12`, `${numerator + 2}/6`, "1/6"], answer, `Tienen el mismo denominador: ${numerator}/6 + 1/6 = ${answer}.`);
-}
-
-function generateAdvancedQuestion() {
-  const kind = sample(["algebra", "square", "area", "input", "order", "geometry", "truefalse"], 1)[0];
-  if (kind === "square") {
-    const n = randomInt(4, 12);
-    return makeQuestion(`¿Cuánto es ${n}^2?`, numberOptions(n * n, 25), n * n, `${n}^2 significa ${n} × ${n} = ${n * n}.`);
-  }
-  if (kind === "area") {
-    const side = randomInt(5, 14);
-    return makeQuestion(`Área de un cuadrado de lado ${side}:`, numberOptions(side * side, 30), side * side, `Área = lado × lado = ${side} × ${side} = ${side * side}.`);
-  }
-  if (kind === "input") {
-    const x = randomInt(4, 14);
-    const factor = randomInt(2, 5);
-    return makeQuestion(`Escribe x: ${factor}x = ${factor * x}`, [], x, `Divide ${factor * x} entre ${factor}: x = ${x}.`, "input");
-  }
-  if (kind === "order") {
-    const x = randomInt(3, 10);
-    const add = randomInt(3, 9);
-    const steps = [`x + ${add} = ${x + add}`, `Resta ${add} a ambos lados`, `x = ${x}`];
-    return makeQuestion(`Ordena los pasos para despejar x`, [], steps.join("|"), `Al restar ${add}, queda x = ${x}.`, "order", { steps });
-  }
-  if (kind === "geometry") {
-    const side = randomInt(3, 8);
-    return makeQuestion(`El cuadrado tiene lado ${side}. ¿Cuál es su área?`, numberOptions(side * side, 18), side * side, `Área = lado × lado = ${side * side}.`, "visual", { visual: { type: "square", side } });
-  }
-  if (kind === "truefalse") {
-    const x = randomInt(2, 9);
-    const shown = Math.random() > 0.5 ? x : x + 1;
-    return makeQuestion(`Si x + 3 = ${x + 3}, entonces x = ${shown}`, ["Verdadero", "Falso"], shown === x ? "Verdadero" : "Falso", `x = ${x + 3} - 3 = ${x}.`, "truefalse");
-  }
-  const x = randomInt(3, 12);
-  const add = randomInt(2, 12);
-  return makeQuestion(`x + ${add} = ${x + add}. ¿x = ?`, numberOptions(x, 8), x, `Resta ${add}: x = ${x + add} - ${add} = ${x}.`);
-}
-
-function generateQuestion(levelKey, boss = false) {
-  const generators = {
-    basico: generateBasicQuestion,
-    intermedio: generateIntermediateQuestion,
-    preavanzado: generateAdvancedQuestion
-  };
-  let question = (generators[levelKey] || generateBasicQuestion)();
-  if (boss) {
-    let guard = 0;
-    while ((!question.o || question.o.length < 2) && guard < 8) {
-      question = (generators[levelKey] || generateBasicQuestion)();
-      guard += 1;
-    }
-    if (!question.o || question.o.length < 2) {
-      question = makeQuestion("Golpe final: 6 × 7 = ?", ["36", "40", "42", "48"], "42", "6 × 7 = 42.");
-    }
-  }
-  question.generated = true;
-  if (boss) question.tipo = "boss";
-  return question;
-}
-
-function enrichQuestions(levelKey, baseQuestions) {
-  const fixed = sample(baseQuestions || [], Math.min(3, (baseQuestions || []).length));
-  const generated = Array.from({ length: 5 }, () => generateQuestion(levelKey));
-  return shuffle([...fixed, ...generated]).slice(0, 6);
-}
-
-function unlockAchievement(profile, key) {
-  if (profile.achievements[key]) return false;
-  profile.achievements[key] = new Date().toISOString();
-  return true;
-}
-
-function unlockStory(profile, levelKey) {
-  const zone = STORY_ZONES[levelKey];
-  if (!zone) return false;
-  profile.story.crystals[levelKey] = true;
-  if (zone.unlocks && !profile.story.unlocked.includes(zone.unlocks)) {
-    profile.story.unlocked.push(zone.unlocks);
-  }
-  return true;
-}
-
 async function boot() {
   renderSplash();
   if (window.location.protocol !== "file:") {
@@ -551,7 +141,7 @@ function renderSplash() {
 
 function renderMenu() {
   clearTimer();
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   applyTheme(profile);
   const avatar = AVATARS[profile.avatar] || AVATARS.maga;
   const progress = getProfileProgress(profile);
@@ -634,7 +224,7 @@ function renderMenu() {
 function renderProfiles() {
   const avatarOptions = Object.entries(AVATARS).map(([key, avatar]) => `
     <label class="avatar-option">
-      <input type="radio" name="avatar" value="${key}" ${key === activeProfile().avatar ? "checked" : ""}>
+      <input type="radio" name="avatar" value="${key}" ${key === activeProfile(state).avatar ? "checked" : ""}>
       <span style="--avatar:${avatar.color}">${avatarImage(avatar, "avatar-thumb")}</span>
       ${esc(avatar.name)}
     </label>
@@ -681,7 +271,7 @@ function renderProfiles() {
   app.querySelectorAll("[data-select-profile]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.data.activeProfileId = btn.dataset.selectProfile;
-      saveData();
+      saveData(state);
       renderMenu();
     });
   });
@@ -690,7 +280,7 @@ function renderProfiles() {
       const profile = state.data.profiles.find((item) => item.id === btn.dataset.profileAvatar);
       if (!profile) return;
       profile.avatar = btn.dataset.avatar;
-      saveData();
+      saveData(state);
       renderProfiles();
     });
   });
@@ -703,13 +293,13 @@ function addProfile() {
   const id = `p${Date.now()}`;
   state.data.profiles.push(createProfile(id, name, { avatar: avatarInput?.value || "maga" }));
   state.data.activeProfileId = id;
-  saveData();
+  saveData(state);
   renderProfiles();
 }
 
 function renderShop() {
   clearTimer();
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const items = Object.entries(POWER_SHOP).map(([key, item]) => `
     <article class="card shop-item">
       <div>
@@ -764,17 +354,17 @@ function renderShop() {
 }
 
 function buyPower(key) {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const item = POWER_SHOP[key];
   if (!item || profile.monedas < item.cost) return;
   profile.monedas -= item.cost;
   profile.inventario[key] = (profile.inventario[key] || 0) + 1;
-  saveData();
+  saveData(state);
   renderShop();
 }
 
 function buyTheme(key) {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const item = THEME_SHOP[key];
   if (!item) return;
   if (!profile.inventario.temas.includes(key)) {
@@ -783,13 +373,13 @@ function buyTheme(key) {
     profile.inventario.temas.push(key);
   }
   profile.inventario.tema = key;
-  saveData();
+  saveData(state);
   applyTheme(profile);
   renderShop();
 }
 
 function renderStory() {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const avatar = AVATARS[profile.avatar] || AVATARS.maga;
   const summary = getProfileProgress(profile);
   const zones = Object.entries(STORY_ZONES).map(([key, zone], index) => {
@@ -854,7 +444,7 @@ function renderStory() {
 }
 
 function renderDaily() {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const today = todayKey();
   const doneToday = !!profile.daily.completed[today];
   const reward = doneToday ? profile.daily.completed[today] : 25 + Math.min(profile.daily.streak, 5) * 5;
@@ -886,7 +476,7 @@ function renderDaily() {
 }
 
 function renderProgress() {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const summary = getProfileProgress(profile);
   const levelRows = Object.entries(STORY_ZONES).map(([key, zone]) => {
     const progress = getLevelProgress(profile, key);
@@ -981,12 +571,12 @@ function resetProfile(id) {
   if (index < 0) return;
   const old = state.data.profiles[index];
   state.data.profiles[index] = createProfile(old.id, old.name, { avatar: old.avatar });
-  saveData();
+  saveData(state);
   renderTeacher();
 }
 
 function renderAchievements() {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const items = Object.entries(ACHIEVEMENTS).map(([key, achievement]) => `
     <article class="card achievement ${profile.achievements[key] ? "unlocked" : ""}">
       <h3>${esc(achievement.title)}</h3>
@@ -1010,8 +600,10 @@ function renderAchievements() {
   app.querySelector("[data-menu]").addEventListener("click", renderMenu);
 }
 
-function renderRanking() {
-  const rows = state.data.ranking
+const RANKING_FILE = "ranking.json";
+
+function formatRankingRows(entries) {
+  return entries
     .slice()
     .sort((a, b) => b.pts - a.pts || a.seg - b.seg)
     .slice(0, 12)
@@ -1025,6 +617,116 @@ function renderRanking() {
         <td>${entry.seg}s</td>
       </tr>
     `).join("");
+}
+
+function getProfileRankingPosition(profileId, ranking = state.data.ranking) {
+  return ranking
+    .slice()
+    .sort((a, b) => b.pts - a.pts || a.seg - b.seg)
+    .findIndex((entry) => entry.profileId === profileId) + 1;
+}
+
+function getProfileRankingEntries(profile) {
+  return Object.entries(profile.scores || {})
+    .filter(([, score]) => typeof score?.pts === "number")
+    .map(([key, score]) => {
+      const [levelKey, mode] = key.split("_");
+      return {
+        profileId: profile.id,
+        profile: profile.name,
+        avatar: profile.avatar,
+        levelKey,
+        level: levels[levelKey]?.nombre || levelKey,
+        mode,
+        pts: score.pts,
+        total: score.total,
+        seg: score.seg,
+        date: score.date || ""
+      };
+    });
+}
+
+async function loadRemoteRanking() {
+  const basePath = location.pathname.endsWith("/")
+    ? location.pathname
+    : location.pathname.replace(/\/[^/]*$/, "/");
+  const url = `${location.origin}${basePath}${RANKING_FILE}`;
+
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return [];
+    const json = await response.json();
+    return Array.isArray(json) ? json : [];
+  } catch {
+    return [];
+  }
+}
+
+function updateRankingForProfile(profile) {
+  const updates = getProfileRankingEntries(profile);
+  if (!updates.length) return false;
+
+  updates.forEach((entry) => {
+    const existing = state.data.ranking.findIndex((item) =>
+      item.profileId === entry.profileId &&
+      item.levelKey === entry.levelKey &&
+      item.mode === entry.mode
+    );
+
+    if (existing >= 0) {
+      const current = state.data.ranking[existing];
+      const better = entry.pts > current.pts || (entry.pts === current.pts && entry.seg < current.seg);
+      if (better) state.data.ranking[existing] = entry;
+    } else {
+      state.data.ranking.push(entry);
+    }
+  });
+
+  state.data.ranking = state.data.ranking
+    .sort((a, b) => b.pts - a.pts || a.seg - b.seg)
+    .slice(0, 30);
+  saveData(state);
+  return true;
+}
+
+function renderRemoteRankingSection(remote) {
+  const remoteRows = remote.length
+    ? formatRankingRows(remote)
+    : `<tr><td colspan="6">No se encontró ranking global o no se pudo cargar.</td></tr>`;
+
+  const container = app.querySelector("#remote-ranking");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="card table-card">
+      <h2>Ranking global</h2>
+      <p>Si la página está publicada en GitHub Pages, coloca un archivo <strong>${RANKING_FILE}</strong> en el mismo sitio para que se cargue aquí.</p>
+      <table>
+        <thead><tr><th>#</th><th>Alumno</th><th>Nivel</th><th>Modo</th><th>Puntos</th><th>Tiempo</th></tr></thead>
+        <tbody>${remoteRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function exportRanking() {
+  if (!navigator.clipboard) {
+    alert("El portapapeles no está disponible en este navegador.");
+    return;
+  }
+
+  navigator.clipboard.writeText(JSON.stringify(state.data.ranking, null, 2))
+    .then(() => alert("Ranking copiado al portapapeles."))
+    .catch(() => alert("No se pudo copiar el ranking. Usa otro navegador o habilita el portapapeles."));
+}
+
+async function renderRanking() {
+  const profile = activeProfile(state);
+  const profileRank = getProfileRankingPosition(profile.id);
+  const profileHasRank = profileRank > 0;
+  const synced = profileHasRank ? `Tu mejor puesto local es #${profileRank}.` : "Aún no hay ningún puntaje de este perfil en el ranking.";
+
+  const rows = formatRankingRows(state.data.ranking);
 
   app.innerHTML = `
     <section class="screen">
@@ -1034,21 +736,47 @@ function renderRanking() {
           <p class="subtitle">Mejores puntajes guardados en este navegador</p>
         </div>
       </header>
-      <div class="toolbar"><button class="btn secondary" data-menu>Volver</button></div>
+      <div class="toolbar">
+        <button class="btn secondary" data-menu>Volver</button>
+        <button class="btn" data-sync-profile>Sincronizar perfil</button>
+        <button class="btn secondary" data-export-ranking>Exportar ranking</button>
+      </div>
+      <div class="card info-card">
+        <p><strong>${esc(profile.name)}</strong> ${esc(synced)}</p>
+        <p>Si tu sitio está publicado en GitHub Pages, publica un archivo <strong>${RANKING_FILE}</strong> en la raíz para habilitar el ranking global.</p>
+      </div>
       <div class="card table-card">
         <table>
           <thead><tr><th>#</th><th>Alumno</th><th>Nivel</th><th>Modo</th><th>Puntos</th><th>Tiempo</th></tr></thead>
           <tbody>${rows || `<tr><td colspan="6">Aún no hay partidas registradas.</td></tr>`}</tbody>
         </table>
       </div>
+      <div id="remote-ranking">
+        <div class="card table-card">
+          <p>Cargando ranking global...</p>
+        </div>
+      </div>
     </section>
   `;
+
   app.querySelector("[data-menu]").addEventListener("click", renderMenu);
+  app.querySelector("[data-sync-profile]").addEventListener("click", () => {
+    const updated = updateRankingForProfile(profile);
+    if (!updated) {
+      alert("No hay puntajes guardados para sincronizar este perfil.");
+      return;
+    }
+    renderRanking();
+  });
+  app.querySelector("[data-export-ranking]").addEventListener("click", exportRanking);
+
+  const remote = await loadRemoteRanking();
+  renderRemoteRankingSection(remote);
 }
 
 function startQuiz(levelKey, mode) {
   clearTimer();
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const level = levels[levelKey];
   if (!level || !profile.story.unlocked.includes(levelKey)) return;
 
@@ -1099,7 +827,7 @@ function startQuiz(levelKey, mode) {
 
 function startDailyQuiz() {
   clearTimer();
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   if (profile.daily.completed[todayKey()]) return renderDaily();
   const keys = Object.keys(levels).filter((key) => profile.story.unlocked.includes(key));
   const questions = Array.from({ length: 5 }, (_, index) => {
@@ -1309,7 +1037,7 @@ function renderQuestion() {
 }
 
 function renderPowerControls() {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const holder = app.querySelector("[data-power-holder]");
   if (!holder) return;
 
@@ -1325,10 +1053,10 @@ function renderPowerControls() {
 }
 
 function spendPower(key) {
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   if ((profile.inventario[key] || 0) <= 0) return false;
   profile.inventario[key] -= 1;
-  saveData();
+  saveData(state);
   return true;
 }
 
@@ -1479,7 +1207,7 @@ function finishQuiz() {
   if (!quiz) return;
   clearTimer();
 
-  const profile = activeProfile();
+  const profile = activeProfile(state);
   const total = quiz.questions.filter((q) => q.tipo !== "fisico").length + quiz.bossNeeded;
   const timeUsed = (quiz.level.tiempo || 0) - quiz.timeLeft;
   const scoreKey = `${quiz.levelKey}_${quiz.mode}`;
@@ -1519,20 +1247,37 @@ function finishQuiz() {
     if (profile.daily.streak >= 3 && unlockAchievement(profile, "daily3")) unlocked.push(ACHIEVEMENTS.daily3.title);
   }
 
-  state.data.ranking.push({
+  const entry = {
+    profileId: profile.id,
     profile: profile.name,
     avatar: profile.avatar,
+    levelKey: quiz.levelKey,
     level: quiz.level.nombre || quiz.levelKey,
     mode: quiz.mode,
     pts: quiz.points,
     total,
     seg: Math.max(0, Math.round(timeUsed)),
     date: new Date().toISOString()
-  });
+  };
+
+  const existing = state.data.ranking.findIndex((item) =>
+    item.profileId === entry.profileId &&
+    item.levelKey === entry.levelKey &&
+    item.mode === entry.mode
+  );
+
+  if (existing >= 0) {
+    const current = state.data.ranking[existing];
+    const better = entry.pts > current.pts || (entry.pts === current.pts && entry.seg < current.seg);
+    if (better) state.data.ranking[existing] = entry;
+  } else {
+    state.data.ranking.push(entry);
+  }
+
   state.data.ranking = state.data.ranking
     .sort((a, b) => b.pts - a.pts || a.seg - b.seg)
     .slice(0, 30);
-  saveData();
+  saveData(state);
 
   const result = { ...quiz, total, timeUsed, isNew, coins, bossDefeated, unlocked };
   quiz = null;
@@ -1575,10 +1320,14 @@ function renderResult(result) {
 
 boot();
 
-if ('serviceWorker' in navigator) {
+if (
+  'serviceWorker' in navigator &&
+  (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {
-      // Service worker registration is optional; continue silently
+    navigator.serviceWorker.register('sw.js').catch((error) => {
+      console.warn('Service Worker registration failed:', error);
     });
   });
 }
+

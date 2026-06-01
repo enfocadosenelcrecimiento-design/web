@@ -5,13 +5,18 @@
   "description": "MathQuest Web - app educativo de matemáticas",
   "main": "app.js",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "start": "npx serve .",
-    "build": "echo \"Web content ready\"",
+    "prepare": "npm run build && npx cap sync",
     "android": "npx cap open android",
     "sync": "npx cap sync"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
-    "@capacitor/core": "^6.0.0"
+    "@capacitor/core": "^6.0.0",
+    "serve": "^14.2.0",
+    "vite": "^5.4.0"
   }
 }

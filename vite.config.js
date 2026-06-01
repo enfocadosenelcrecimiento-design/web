@@ -1,0 +1,14 @@
+const { defineConfig } = require('vite');
+
+module.exports = defineConfig({
+  root: '.',
+  base: './',
+  publicDir: 'public',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: 'index.html'
+    }
+  }
+});
