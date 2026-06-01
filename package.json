@@ -1,0 +1,17 @@
+{
+  "name": "mathquest-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MathQuest Web - app educativo de matemáticas",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo \"Web content ready\"",
+    "android": "npx cap open android",
+    "sync": "npx cap sync"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
